@@ -1,54 +1,63 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:frontend_coding_challenge/viewmodels/controllers/absence_controller.dart';
-import 'package:frontend_coding_challenge/network/response/status.dart';
 
 class AbsenceEmployeeScreen extends StatelessWidget {
   AbsenceEmployeeScreen({super.key});
 
   final AbsencesController controller = Get.put(AbsencesController());
+  final ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
+    // Scroll listener for pagination
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 200 &&
+          !controller.pagingController.isPaginating.value &&
+          !controller.pagingController.isLastPage.value) {
+        controller.pagingController.loadNextPage();
+      }
+    });
+
     return Scaffold(
-      appBar: AppBar(title: const Text("Absences")),
+      appBar: AppBar(
+        title: const Text("Absences"),
+        centerTitle: true,
+      ),
       body: Obx(() {
-        final response = controller.apiResponse.value;
+        final absences = controller.pagingController.absences;
 
-        if (response.status == Status.ERROR) {
-          return Center(child: Text(response.message ?? "Failed to load data"));
-        } else if (response.status == Status.SUCCESS) {
-          final list = response.data ?? [];
-          if (list.isEmpty) {
-            return const Center(child: Text("No absences found"));
-          }
+        // Show "No data" if empty
+        if (absences.isEmpty) {
+          return const Center(child: Text("No absences found"));
+        }
 
-          return ListView.builder(
-            itemCount: list.length,
+        return RefreshIndicator(
+          onRefresh: controller.pagingController.refreshList,
+          child: ListView.builder(
+            controller: _scrollController,
+            itemCount: absences.length,
             itemBuilder: (context, index) {
-              final item = list[index];
-
+              final item = absences[index];
               return Card(
-                margin:
-                const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 child: ListTile(
                   leading: CircleAvatar(
-                    backgroundImage: NetworkImage(item.memberImage ?? ""),
+                    backgroundImage:
+                    item.memberImage != null ? NetworkImage(item.memberImage!) : null,
+                    child: item.memberImage == null ? const Icon(Icons.person) : null,
                   ),
                   title: Text(item.memberName),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: item.getDisplayLines()
-                        .map((line) => Text(line))
-                        .toList(),
+                    children: item.getDisplayLines().map((line) => Text(line)).toList(),
                   ),
                 ),
               );
             },
-          );
-        }
-
-        return const SizedBox.shrink(); // No loader
+          ),
+        );
       }),
     );
   }
