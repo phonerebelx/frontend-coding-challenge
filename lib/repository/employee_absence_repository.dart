@@ -13,6 +13,7 @@ Future<List<dynamic>> readJsonFile(String path) async {
 
 
 Future<List<dynamic>> absences() async {
+
   return await readJsonFile(absencesPath);
 }
 

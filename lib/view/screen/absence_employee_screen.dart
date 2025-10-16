@@ -1,40 +1,54 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_coding_challenge/network/response/status.dart';
-import 'package:frontend_coding_challenge/viewmodels/controllers/members_controller.dart';
 import 'package:get/get.dart';
+import 'package:frontend_coding_challenge/viewmodels/controllers/absence_controller.dart';
+import 'package:frontend_coding_challenge/network/response/status.dart';
 
 class AbsenceEmployeeScreen extends StatelessWidget {
   AbsenceEmployeeScreen({super.key});
 
-  final MembersController controller = Get.put(MembersController());
+  final AbsencesController controller = Get.put(AbsencesController());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Members")),
+      appBar: AppBar(title: const Text("Absences")),
       body: Obx(() {
-      final response = controller.apiResponse.value;
+        final response = controller.apiResponse.value;
 
-      if (response.status == Status.ERROR) {
+        if (response.status == Status.ERROR) {
           return Center(child: Text(response.message ?? "Failed to load data"));
         } else if (response.status == Status.SUCCESS) {
-          final membersList = response.data ?? [];
+          final list = response.data ?? [];
+          if (list.isEmpty) {
+            return const Center(child: Text("No absences found"));
+          }
+
           return ListView.builder(
-            itemCount: membersList.length,
+            itemCount: list.length,
             itemBuilder: (context, index) {
-              final member = membersList[index];
-              return ListTile(
-                leading: CircleAvatar(
-                  backgroundImage: NetworkImage(member.image ?? ""),
+              final item = list[index];
+
+              return Card(
+                margin:
+                const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: NetworkImage(item.memberImage ?? ""),
+                  ),
+                  title: Text(item.memberName),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: item.getDisplayLines()
+                        .map((line) => Text(line))
+                        .toList(),
+                  ),
                 ),
-                title: Text(member.name ?? ""),
-                subtitle: Text("User ID: ${member.userId}"),
               );
             },
           );
-        } else {
-          return const SizedBox.shrink();
         }
+
+        return const SizedBox.shrink(); // No loader
       }),
     );
   }
