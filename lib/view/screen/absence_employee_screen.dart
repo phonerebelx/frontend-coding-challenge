@@ -75,6 +75,7 @@ class AbsenceEmployeeScreen extends StatelessWidget {
                       status: item.status,
                       memberNote: item.memberNote,
                       admitterNote: item.admitterNote,
+                      onGenerateICal: () => controller.generateICalForAbsence(item),
                     );
                   },
                 ),
