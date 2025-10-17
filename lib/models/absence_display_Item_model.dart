@@ -19,17 +19,20 @@ class AbsenceDisplayItem {
 
   /// Returns list of all info lines for easy display
   List<String> getDisplayLines() {
-    final lines = [
-      "Type: $type",
-      "Period: $period",
-      "Status: $status",
-    ];
-    if (memberNote != null && memberNote!.isNotEmpty) {
-      lines.add("Member Note: $memberNote");
-    }
-    if (admitterNote != null && admitterNote!.isNotEmpty) {
-      lines.add("Admitter Note: $admitterNote");
-    }
+    final lines = ["Type: $type", "Period: $period", "Status: $status"];
+
+    // for members note
+    notesIsNotEmpty(memberNote, lines, "Member Note:");
+
+    // for admitter note
+    notesIsNotEmpty(admitterNote, lines, "Admitter Note:");
+
     return lines;
+  }
+
+  notesIsNotEmpty(String? notes, List<String> lines, String heading) {
+    if (notes != null && notes!.isNotEmpty) {
+      lines.add("$heading $notes");
+    }
   }
 }

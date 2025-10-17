@@ -19,14 +19,17 @@ class AbsencesPagingController extends GetxController {
   final RxInt currentPage = 0.obs;
   final int pageSize = 10;
 
-  /// Load the first page
+  // Filters
+  final RxString selectedType = ''.obs;
+  final Rxn<DateTime> startDate = Rxn<DateTime>();
+  final Rxn<DateTime> endDate = Rxn<DateTime>();
+
+  /// Load first page
   Future<void> loadFirstPage() async {
     absences.clear();
     currentPage.value = 0;
     isLastPage.value = false;
-
     absencesResponse.value = ApiResponse.loading(message: "Loading absences...");
-
     await _loadPage(isInitial: true);
   }
 
@@ -43,31 +46,32 @@ class AbsencesPagingController extends GetxController {
       absencesResponse.value = ApiResponse.error(message: "Error: $e");
     } finally {
       isPaginating.value = false;
-      absencesResponse.value = ApiResponse.success(
-          data: absences.toList(), message: "Loaded successfully");
+      absencesResponse.value =
+          ApiResponse.success(data: absences.toList(), message: "Loaded successfully");
     }
   }
 
-  /// Internal method to fetch a page
   Future<void> _loadPage({required bool isInitial}) async {
     final newItems = await repository.fetchAbsencesPage(
       pageKey: currentPage.value * pageSize,
+      type: selectedType.value.isNotEmpty ? selectedType.value : null,
+      startDate: startDate.value,
+      endDate: endDate.value,
     );
 
     if (newItems.isEmpty) {
       isLastPage.value = true;
       if (isInitial) {
-        absencesResponse.value = ApiResponse.success(
-            data: absences.toList(), message: "No absences found");
+        absencesResponse.value = ApiResponse.empty(message: "No absences found");
       }
       return;
     }
 
     absences.addAll(newItems);
     currentPage.value++;
-
-    final last = await repository.isLastPage(currentPage.value * pageSize);
-    if (last) isLastPage.value = true;
+    if (await repository.isLastPage(currentPage.value * pageSize)) {
+      isLastPage.value = true;
+    }
 
     if (isInitial) {
       absencesResponse.value =
@@ -75,8 +79,21 @@ class AbsencesPagingController extends GetxController {
     }
   }
 
-  /// Refresh the list
   Future<void> refreshList() async {
     await loadFirstPage();
   }
+
+  /// Apply filters
+  void applyFilters({String? type, DateTime? start, DateTime? end}) {
+    if (type == null || type.isEmpty) {
+      // "All" selected
+      selectedType.value = '';
+    } else {
+      selectedType.value = type.toLowerCase();
+    }
+    startDate.value = start;
+    endDate.value = end;
+    loadFirstPage();
+  }
+
 }

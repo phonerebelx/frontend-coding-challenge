@@ -3,11 +3,15 @@ import 'package:frontend_coding_challenge/models/absences_model.dart';
 import 'package:frontend_coding_challenge/models/members_model.dart';
 import 'package:frontend_coding_challenge/repository/employee_absence_repository.dart';
 
-
 class AbsencesPaginationRepository {
   static const int pageSize = 10;
 
-  Future<List<AbsenceDisplayItem>> fetchAbsencesPage({required int pageKey}) async {
+  Future<List<AbsenceDisplayItem>> fetchAbsencesPage({
+    required int pageKey,
+    String? type,
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
     // Simulate local JSON delay
     await Future.delayed(const Duration(milliseconds: 500));
 
@@ -17,15 +21,63 @@ class AbsencesPaginationRepository {
     final absencesList = absencesData.map((e) => Payload.fromJson(e)).toList();
     final membersList = membersData.map((e) => MemberPayload.fromJson(e)).toList();
 
-    // Map Payload + MemberPayload to AbsenceDisplayItem
-    final combinedList = absencesList.map((absence) {
+    // ✅ Filter absences
+    final filteredAbsences = _filterAbsences(
+      absencesList,
+      type: type,
+      startDate: startDate,
+      endDate: endDate,
+    );
+
+    // ✅ Map to display items
+    final combinedList = _mapToDisplayItems(filteredAbsences, membersList);
+
+    // ✅ Pagination slice
+    final start = pageKey;
+    final end = (pageKey + pageSize) < combinedList.length
+        ? pageKey + pageSize
+        : combinedList.length;
+
+    if (start >= combinedList.length) return [];
+
+    return combinedList.sublist(start, end);
+  }
+
+  /// Private: filter absences based on type and dates
+  List<Payload> _filterAbsences(
+      List<Payload> absencesList, {
+        String? type,
+        DateTime? startDate,
+        DateTime? endDate,
+      }) {
+    return absencesList.where((absence) {
+      bool matchesType = type == null || absence.type?.toLowerCase() == type.toLowerCase();
+      bool matchesDate = true;
+
+      if (startDate != null && absence.startDate != null) {
+        final absenceStart = DateTime.tryParse(absence.startDate!) ?? DateTime(1900);
+        matchesDate = absenceStart.isAfter(startDate) || absenceStart.isAtSameMomentAs(startDate);
+      }
+
+      if (endDate != null && absence.endDate != null) {
+        final absenceEnd = DateTime.tryParse(absence.endDate!) ?? DateTime(1900);
+        matchesDate = matchesDate &&
+            (absenceEnd.isBefore(endDate) || absenceEnd.isAtSameMomentAs(endDate));
+      }
+
+      return matchesType && matchesDate;
+    }).toList();
+  }
+
+  List<AbsenceDisplayItem> _mapToDisplayItems(
+      List<Payload> absencesList, List<MemberPayload> membersList) {
+    return absencesList.map((absence) {
       final member = membersList.firstWhere(
             (m) => m.userId == absence.userId,
         orElse: () => MemberPayload(name: "Unknown"),
       );
 
       final status = getStatus(absence);
-
       final period = "${absence.startDate ?? "-"} to ${absence.endDate ?? "-"}";
 
       return AbsenceDisplayItem(
@@ -38,14 +90,6 @@ class AbsencesPaginationRepository {
         admitterNote: absence.admitterNote,
       );
     }).toList();
-
-    // Pagination slice
-    final start = pageKey;
-    final end = (pageKey + pageSize) < combinedList.length
-        ? pageKey + pageSize
-        : combinedList.length;
-
-    return combinedList.sublist(start, end);
   }
 
   Future<bool> isLastPage(int pageKey) async {

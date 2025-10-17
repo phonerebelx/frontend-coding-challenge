@@ -24,11 +24,15 @@ class ApiResponse<T> {
     _handleLoading();
   }
 
+  ApiResponse.empty({this.message}) : status = Status.EMPTY {
+    _handleLoading();
+  }
+
   void _handleLoading() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (status == Status.LOADING) {
         await utils.startLoading(Get.context!);
-      } else if (status == Status.SUCCESS || status == Status.ERROR) {
+      } else if (status == Status.SUCCESS || status == Status.ERROR || status == Status.EMPTY) {
         await utils.stopLoading();
       }
     });
