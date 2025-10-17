@@ -45,7 +45,7 @@ class utils {
     Get.dialog(
       const Center(
         child: SpinKitSpinningLines(
-          color: colors.lightRedColor,
+          color: colors.orangeColor,
           lineWidth: 5.0,
         ),
       ),

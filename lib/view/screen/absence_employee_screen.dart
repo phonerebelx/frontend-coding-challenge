@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_coding_challenge/network/response/status.dart';
-import 'package:get/get.dart';
+import 'package:frontend_coding_challenge/res/colors/colors.dart';
+import 'package:frontend_coding_challenge/view/widgets/custom_scaffold.dart';
+import 'package:frontend_coding_challenge/view/widgets/employee_detail_card.dart';
 import 'package:frontend_coding_challenge/viewmodels/controllers/absence_controller.dart';
+import 'package:get/get.dart';
 
 class AbsenceEmployeeScreen extends StatelessWidget {
   AbsenceEmployeeScreen({super.key});
@@ -11,6 +14,7 @@ class AbsenceEmployeeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Pagination listener
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
           _scrollController.position.maxScrollExtent - 200 &&
@@ -20,74 +24,64 @@ class AbsenceEmployeeScreen extends StatelessWidget {
       }
     });
 
-    return Scaffold(
-      appBar: AppBar(title: const Text("Absences"), centerTitle: true),
-      body: SafeArea(
-        child: Column(
-          children: [
-            _buildFilterBar(context),
-            const Divider(height: 1),
-            Expanded(
-              child: Obx(() {
-                final response = controller.pagingController.absencesResponse.value;
+    return CustomScaffold(
+      title: "ABSENCES",
+      appBarColor: colors.whiteColor,
+      appBarTextColor: colors.blackColor,
+      backgroundColor: colors.whiteColor,
+      showBackButton: false,
+      body: Column(
+        children: [
+          _buildFilterBar(context),
+          const Divider(height: 1),
+          // Expanded list
+          Expanded(
+            child: Obx(() {
+              final absences = controller.pagingController.absences;
 
-                switch (response.status) {
+              if (absences.isEmpty) {
+                final status = controller.pagingController.absencesResponse.value.status;
+                switch (status) {
+                  case Status.LOADING:
+                    return const SizedBox.shrink(); // handled by global loader
                   case Status.ERROR:
                     return Center(
-                      child: Text(response.message ?? "Something went wrong"),
-                    );
-                  case Status.LOADING:
-                    return const Center(
-                      child: Text("Loading absence"),
-                    );
-                  case Status.EMPTY:
-                    return const Center(
-                      child: Text("No absences found"),
-                    );
-
-                  case Status.SUCCESS:
-                  default:
-                    final absences = response.data ?? [];
-                    if (absences.isEmpty) {
-                      return const Center(child: Text("No absences found"));
-                    }
-                    return RefreshIndicator(
-                      onRefresh: controller.pagingController.refreshList,
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        itemCount: absences.length,
-                        itemBuilder: (context, index) {
-                          final item = absences[index];
-                          return Card(
-                            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                            child: ListTile(
-                              leading: CircleAvatar(
-                                backgroundImage: item.memberImage != null
-                                    ? NetworkImage(item.memberImage!)
-                                    : null,
-                                child: item.memberImage == null
-                                    ? const Icon(Icons.person)
-                                    : null,
-                              ),
-                              title: Text(item.memberName),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children:
-                                item.getDisplayLines().map((line) => Text(line)).toList(),
-                              ),
-                            ),
-                          );
-                        },
+                      child: Text(
+                        controller.pagingController.absencesResponse.value.message ??
+                            "Something went wrong",
                       ),
                     );
+                  case Status.EMPTY:
+                  case Status.SUCCESS:
+                  default:
+                    return const Center(child: Text("No absences found"));
                 }
-              }),
-            )
+              }
 
-          ],
-        ),
+              // List with preserved scroll position
+              return RefreshIndicator(
+                onRefresh: controller.pagingController.refreshList,
+                child: ListView.builder(
+                  controller: _scrollController,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  itemCount: absences.length,
+                  itemBuilder: (context, index) {
+                    final item = absences[index];
+                    return EmployeeDetailCard(
+                      imageUrl: item.memberImage,
+                      memberName: item.memberName,
+                      type: item.type,
+                      period: item.period,
+                      status: item.status,
+                      memberNote: item.memberNote,
+                      admitterNote: item.admitterNote,
+                    );
+                  },
+                ),
+              );
+            }),
+          ),
+        ],
       ),
     );
   }
@@ -98,39 +92,35 @@ class AbsenceEmployeeScreen extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Obx(
-                  () {
-                // Start with a list and add "All" option first
-                List<DropdownMenuItem<String>> dropdownItems = [
-                  const DropdownMenuItem(
-                    value: null,
-                    child: Text("All"),
+            child: Obx(() {
+              List<DropdownMenuItem<String>> dropdownItems = [
+                const DropdownMenuItem(
+                  value: null,
+                  child: Text("All"),
+                ),
+              ];
+
+              for (var displayName in controller.leaveTypes) {
+                dropdownItems.add(
+                  DropdownMenuItem(
+                    value: controller.typeValue(displayName),
+                    child: Text(displayName),
                   ),
-                ];
-
-                // Add other leave types
-                for (var displayName in controller.leaveTypes) {
-                  dropdownItems.add(
-                    DropdownMenuItem(
-                      value: controller.typeValue(displayName),
-                      child: Text(displayName),
-                    ),
-                  );
-                }
-
-                return DropdownButton<String>(
-                  isExpanded: true,
-                  hint: const Text("Select Type"),
-                  value: controller.pagingController.selectedType.value.isNotEmpty
-                      ? controller.pagingController.selectedType.value
-                      : null,
-                  items: dropdownItems,
-                  onChanged: (value) {
-                    controller.pagingController.applyFilters(type: value);
-                  },
                 );
-              },
-            ),
+              }
+
+              return DropdownButton<String>(
+                isExpanded: true,
+                hint: const Text("Select Type"),
+                value: controller.pagingController.selectedType.value.isNotEmpty
+                    ? controller.pagingController.selectedType.value
+                    : null,
+                items: dropdownItems,
+                onChanged: (value) {
+                  controller.pagingController.applyFilters(type: value);
+                },
+              );
+            }),
           ),
           const SizedBox(width: 10),
           IconButton(
