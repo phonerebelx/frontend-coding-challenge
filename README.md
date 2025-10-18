@@ -56,6 +56,7 @@ This project includes comprehensive unit tests to ensure correctness of business
 ✅ absence_controller_test.dart
 * Verifies mapping between UI display names and internal type codes.
 * Ensures all leave type keys are returned correctly.
+
 ✅ absences_paging_repository_test.dart
 * Tests repository pagination logic (fetchAbsencesPage with paging).
 * Validates filtering behavior by absence type.
