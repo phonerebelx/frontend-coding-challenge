@@ -80,22 +80,25 @@ flutter run
 4️⃣ Run tests
 flutter test
 
-🧰 Folder Structure
 
+🧰 Folder Structure
+```
 lib/
- ├── assets/               # Images, icons
- ├── json_files/           # Mock JSON data for absences & members
- ├── network/              # API response & status handling
- ├── models/               # Data models (Payloads, DisplayItems)
- ├── repository/           # Data repositories (pagination, employee)
- ├── res/                  # App resources (colors, strings, styles)
- ├── utils/                # Utilities (iCal generator, date helpers)
- ├── view/                 # Screens and widgets
- ├── viewmodels/           # Controllers (GetX)
- └── main.dart             # Entry point
+├── assets/          # Images, icons
+├── json_files/      # Mock JSON data for absences & members
+├── network/         # API response & status handling
+├── models/          # Data models (Payloads, DisplayItems)
+├── repository/      # Data repositories (pagination, employee)
+├── res/             # App resources (colors, strings, styles)
+├── utils/           # Utilities (iCal generator, date helpers)
+├── view/            # Screens and widgets
+├── viewmodels/      # Controllers (GetX)
+└── main.dart        # Entry point
+
 test/
- ├── controllers/               # Controller unit tests
- ├── repositories/              # repository unit tests
+├── controllers/     # Controller unit tests
+└── repositories/    # Repository unit tests
+```
 
 🧩 Highlights
 
@@ -109,7 +112,9 @@ test/
 
 I’m Syed Abdul Ali, a Senior Android & Flutter Developer with over 3 years of experience building scalable and maintainable mobile apps.
 This project reflects my approach to clean architecture, performance optimization, and test-driven development.
+
 📧 Email: ali962001@gmail.com
+
 🌐 GitHub: [phonerebelx](https://github.com/phonerebelx)
 
 💬 Acknowledgment
