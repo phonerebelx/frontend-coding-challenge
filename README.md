@@ -66,14 +66,14 @@ All tests are written using the flutter_test package and GetX test mode to simul
 
 ⚙️ Project Setup & Run Instructions
 
-1️⃣ Clone the repository
+1️⃣ Clone the repository:
 git clone https://github.com/phonerebelx/frontend-coding-challenge.git
 cd frontend-coding-challenge
 
-2️⃣ Install dependencies
+2️⃣ Install dependencies:
 flutter pub get
 
-3️⃣ Run the app
+3️⃣ Run the app:
 flutter run
 
 4️⃣ Run tests
