@@ -35,14 +35,11 @@ class EmployeeDetailCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
-    final cardHeight = screenHeight * 0.66;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
-      width: screenWidth - 4,
-      height: cardHeight,
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      width: screenWidth - 16,
       child: Card(
         elevation: elevation,
         color: backgroundColor,
@@ -52,75 +49,73 @@ class EmployeeDetailCard extends StatelessWidget {
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // Image Section
+            // Image section
             EmployeeCardImage(
               imageUrl: imageUrl,
-              height: cardHeight * 0.5,
+              height: 200,
               borderRadius: borderRadius - 2,
             ),
 
-            // Details Section
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 26.0, vertical: 12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CustomText(
-                      text: memberName,
-                      textColor: colors.blackColor,
-                      fontSize: 24,
-                      height: 1.6,
-                      fontWeight: FontWeight.w500,
-                      maxLines: 1,
-                      textAlign: TextAlign.start,
-                      fontFamily: AppFonts.manrope_semi_bold,
-                    ),
-                    const SizedBox(height: 2),
-                    _buildInfoText("Type: $type"),
-                    _buildInfoText("Period: $period"),
-                    _buildInfoText("Status: $status"),
+            // Details section
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CustomText(
+                    text: memberName,
+                    textColor: colors.blackColor,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    maxLines: 2,
+                    fontFamily: AppFonts.manrope_semi_bold,
+                  ),
+                  const SizedBox(height: 6),
+                  _buildInfoText("Type: $type"),
+                  _buildInfoText("Period: $period"),
+                  _buildInfoText("Status: $status"),
 
-                    if (memberNote != null && memberNote!.trim().isNotEmpty) _buildInfoText("Member Note: $memberNote", maxLines: 2),
-                    if (admitterNote != null && admitterNote!.trim().isNotEmpty) _buildInfoText("Admitter Note: $admitterNote", maxLines: 2),
+                  if (memberNote != null && memberNote!.trim().isNotEmpty)
+                    _buildInfoText("Member Note: $memberNote", maxLines: 4),
+                  if (admitterNote != null && admitterNote!.trim().isNotEmpty)
+                    _buildInfoText("Admitter Note: $admitterNote", maxLines: 4),
 
-                    const SizedBox(height: 8),
+                  const SizedBox(height: 12),
 
-                    // Generate iCal Button
-                    Align(
-                      alignment: Alignment.center,
-                      child: CustomButton(
-                        height: 36,
-                        width: 160,
-                        title: "Generate iCal",
-                        fontSize: 12,
-                        textColor: Colors.white,
-                        btnColor: colors.orangeColor,
-                        borderRadius: BorderRadius.circular(8),
-                        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-                        onTap: onGenerateICal,
-                        isWidgetTrue: true,
-                        customWidget: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(Icons.calendar_month_outlined,
-                                color: Colors.white, size: 16),
-                            SizedBox(width: 6),
-                            Text(
-                              "Generate iCal",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
+                  // Generate iCal button
+                  Center(
+                    child: CustomButton(
+                      height: 40,
+                      width: 160,
+                      title: "Generate iCal",
+                      fontSize: 13,
+                      textColor: Colors.white,
+                      btnColor: colors.orangeColor,
+                      borderRadius: BorderRadius.circular(8),
+                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                      onTap: onGenerateICal,
+                      isWidgetTrue: true,
+                      customWidget: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.calendar_month_outlined,
+                              color: Colors.white, size: 16),
+                          SizedBox(width: 6),
+                          Text(
+                            "Generate iCal",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -129,14 +124,17 @@ class EmployeeDetailCard extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoText(String text, {int maxLines = 1}) {
-    return CustomText(
-      text: text,
-      textColor: colors.blackColor,
-      fontSize: 16,
-      height: 1.4,
-      maxLines: maxLines,
-      fontFamily: AppFonts.manrope_semi_bold,
+  Widget _buildInfoText(String text, {int maxLines = 2}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4.0),
+      child: CustomText(
+        text: text,
+        textColor: colors.blackColor,
+        fontSize: 15,
+        height: 1.4,
+        maxLines: maxLines,
+        fontFamily: AppFonts.manrope_regular,
+      ),
     );
   }
 }
