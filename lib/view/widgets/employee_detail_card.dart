@@ -53,14 +53,14 @@ class EmployeeDetailCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: Column(
           children: [
-            // 🖼️ Image Section
+            // Image Section
             EmployeeCardImage(
               imageUrl: imageUrl,
               height: cardHeight * 0.5,
               borderRadius: borderRadius - 2,
             ),
 
-            // 📄 Details Section
+            // Details Section
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 26.0, vertical: 12.0),
@@ -82,10 +82,8 @@ class EmployeeDetailCard extends StatelessWidget {
                     _buildInfoText("Period: $period"),
                     _buildInfoText("Status: $status"),
 
-                    if (memberNote != null)
-                      _buildInfoText("Member Note: $memberNote", maxLines: 2),
-                    if (admitterNote != null)
-                      _buildInfoText("Admitter Note: $admitterNote", maxLines: 2),
+                    if (memberNote != null && memberNote!.trim().isNotEmpty) _buildInfoText("Member Note: $memberNote", maxLines: 2),
+                    if (admitterNote != null && admitterNote!.trim().isNotEmpty) _buildInfoText("Admitter Note: $admitterNote", maxLines: 2),
 
                     const SizedBox(height: 8),
 

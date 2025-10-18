@@ -42,7 +42,7 @@ END:VCALENDAR
       await Share.shareXFiles([XFile(filePath)], text: "Add to Calendar");
 
     } catch (e) {
-      print('❌ Error generating iCal: $e');
+      print('Error generating iCal: $e');
       rethrow;
     }
   }

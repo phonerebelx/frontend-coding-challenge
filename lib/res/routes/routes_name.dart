@@ -1,3 +1,4 @@
 class RoutesName {
-  static const String absenceEmployeeScreen = "/";
+  static const String splashScreen = "/";
+  static const String absenceEmployeeScreen = "/absence_employee_screen";
 }

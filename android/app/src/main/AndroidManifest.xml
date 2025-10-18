@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="frontend_coding_challenge"
+        android:label="crewmeister_coding_challenge"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

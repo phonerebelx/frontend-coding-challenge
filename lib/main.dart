@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         // textTheme: AppFonts.lightTextTheme,
         useMaterial3: true,
       ),
-      initialRoute: RoutesName.absenceEmployeeScreen,
+      initialRoute: RoutesName.splashScreen,
       getPages: AppRoutes.appRoute(),
     );
   }
