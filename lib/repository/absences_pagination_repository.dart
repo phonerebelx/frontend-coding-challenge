@@ -21,7 +21,7 @@ class AbsencesPaginationRepository {
     final absencesList = absencesData.map((e) => Payload.fromJson(e)).toList();
     final membersList = membersData.map((e) => MemberPayload.fromJson(e)).toList();
 
-    // ✅ Filter absences
+    // Filter absences
     final filteredAbsences = _filterAbsences(
       absencesList,
       type: type,
@@ -29,10 +29,10 @@ class AbsencesPaginationRepository {
       endDate: endDate,
     );
 
-    // ✅ Map to display items
+    // Map to display items
     final combinedList = _mapToDisplayItems(filteredAbsences, membersList);
 
-    // ✅ Pagination slice
+    // Pagination slice
     final start = pageKey;
     final end = (pageKey + pageSize) < combinedList.length
         ? pageKey + pageSize
